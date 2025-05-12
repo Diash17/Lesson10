@@ -1,5 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.Xml.Linq;
+using static System.Formats.Asn1.AsnWriter;
 namespace Lesson10
 {
     public class Program
@@ -25,7 +26,7 @@ namespace Lesson10
         {
             foreach (var store in stores)
             {
-                Console.WriteLine($"Магазин: {store.Name}, Размер склада: {store.StorageSize} Яблок всего {store.AppleAmount}, Апельсинов всего {store.OrangeAmount}, Яблок на складе: {store.AppleStock}, Продано яблок: {store.AppleSold}, Апельсинов на складе: {store.OrangeStock}, Продано апельсинов: {store.OrangeSold}");
+                Console.WriteLine($"Магазин: {store.Name}, Размер склада: {store.StorageSize}, Цена яблок {store.ApplePrice}, Цена апельсинов {store.OrangePrice}, Яблок на складе: {store.AppleStock}, Продано яблок: {store.AppleSold}, Апельсинов на складе: {store.OrangeStock}, Продано апельсинов: {store.OrangeSold}");
             }
         }
 
@@ -44,8 +45,8 @@ namespace Lesson10
                     new Store(
                             name: data[0],
                             storageSize: int.Parse(data[1]),
-                            appleAmount: int.Parse(data[2]),
-                            orangeAmount: int.Parse(data[3]),
+                            applePrice: int.Parse(data[2]),
+                            orangePrice: int.Parse(data[3]),
                             appleStock: int.Parse(data[4]),
                             appleSold: int.Parse(data[5]),
                             orangeStock: int.Parse(data[6]),
@@ -63,7 +64,8 @@ namespace Lesson10
                 Console.WriteLine("1. Добавить товар в магазин");
                 Console.WriteLine("2. Выйти");
                 Console.WriteLine("3. Добавить к продажам");
-                Console.WriteLine("4. Вывести csv файл");
+                Console.WriteLine("4. Вывести выручку магазина");
+                Console.WriteLine("5. Вывести csv файл");
                 Console.Write("Выберите действие: ");
 
                 var input = Console.ReadLine();
@@ -79,6 +81,9 @@ namespace Lesson10
                         HandleAddSell();
                         break;
                     case "4":
+                        ShowRevenueSorted();
+                        break;
+                    case "5":
                         ReadFile();
                         PrintStoresInfo();
                         break;
@@ -147,7 +152,6 @@ namespace Lesson10
                     return false;
                 }
                 store.AppleStock += amount;
-                store.AppleAmount -= amount;
             }
             else
             {
@@ -158,7 +162,6 @@ namespace Lesson10
                     return false;
                 }
                 store.OrangeStock += amount;
-                store.OrangeAmount -= amount;
             }
             return true;
         }
@@ -167,7 +170,7 @@ namespace Lesson10
         {
             if (isApple)
             {
-                if (store.AppleStock < amount) 
+                if (store.AppleStock < amount)
                 {
                     Console.WriteLine("Ошибка! Нельзя продать больше чем на складе");
                     return false;
@@ -199,7 +202,7 @@ namespace Lesson10
 
                     foreach (var store in stores)
                     {
-                        writer.WriteLine($"{store.Name},{store.StorageSize},{store.AppleAmount},{store.OrangeAmount},{store.AppleStock},{store.AppleSold},{store.OrangeStock},{store.OrangeSold}");
+                        writer.WriteLine($"{store.Name},{store.StorageSize},{store.ApplePrice},{store.OrangePrice},{store.AppleStock},{store.AppleSold},{store.OrangeStock},{store.OrangeSold}");
                     }
                 }
 
@@ -263,6 +266,38 @@ namespace Lesson10
 
             Console.WriteLine(choice == 1 ? "Вы выбрали яблоки" : "Вы выбрали апельсины");
             return choice;
+        }
+
+        static int CalculateRevenue(Store store)
+        {
+            return (store.ApplePrice*store.AppleSold)+(store.OrangePrice*store.OrangeSold);
+           
+        }
+        static void ShowRevenueSorted()
+        {
+            List<Store> sortedStores = new List<Store>(stores);
+
+            for (int i = 0; i < sortedStores.Count - 1; i++)
+            {
+                for (int j = 0; j < sortedStores.Count - 1 - i; j++)
+                {
+                    int revenueJ = CalculateRevenue(sortedStores[j]);
+                    int revenueJPlus1 = CalculateRevenue(sortedStores[j + 1]);
+
+                    if (revenueJ < revenueJPlus1)
+                    {
+                        Store temp = sortedStores[j];
+                        sortedStores[j] = sortedStores[j + 1];
+                        sortedStores[j + 1] = temp;
+                    }
+                }
+            }
+
+            Console.WriteLine("\nВыручка магазинов (отсортировано по убыванию):");
+            foreach (var store in sortedStores)
+            {
+                Console.WriteLine($"- {store.Name}: {CalculateRevenue(store)} рублей");
+            }
         }
     }
 }

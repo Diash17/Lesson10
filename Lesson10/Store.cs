@@ -10,8 +10,8 @@ namespace Lesson10
     {
         public string Name { get; set; }
         public int StorageSize { get; set; }
-        public int AppleAmount { get; set; }
-        public int OrangeAmount { get; set; }
+        public int ApplePrice { get; set; }
+        public int OrangePrice { get; set; }
         public int AppleStock { get; set; }
 
         public int OrangeStock { get; set; }
@@ -20,12 +20,12 @@ namespace Lesson10
 
         public int OrangeSold { get; set; }
 
-        public Store(string name, int storageSize, int appleAmount, int orangeAmount, int appleStock, int orangeStock, int appleSold, int orangeSold)
+        public Store(string name, int storageSize, int applePrice, int orangePrice, int appleStock, int orangeStock, int appleSold, int orangeSold)
         {
             Name = name;
             StorageSize = storageSize;
-            AppleAmount = appleAmount;
-            OrangeAmount = orangeAmount;
+            ApplePrice = applePrice;
+            OrangePrice = orangePrice;
             AppleStock = appleStock;
             OrangeStock = orangeStock;
             AppleSold = appleSold;
